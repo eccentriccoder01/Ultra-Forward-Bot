@@ -1,12 +1,23 @@
 FROM python:3.8-slim-buster
 
-RUN apt update && apt upgrade -y
-RUN apt install git -y
-COPY requirements.txt /requirements.txt
+# Update system and install dependencies
+RUN apt update && apt upgrade -y && apt install -y git
 
-RUN cd /
-RUN pip3 install -U pip && pip3 install -U -r requirements.txt
-RUN JishuDeveloper /Ultra-Forward-Bot
+# Clone the repository (Only if building directly from a blank container)
+# RUN git clone https://github.com/JishuDeveloper/Ultra-Forward-Bot.git
+
+# Copy requirements and install dependencies
+COPY requirements.txt /requirements.txt
+RUN pip3 install --upgrade pip && pip3 install -r /requirements.txt
+
+# Set working directory
 WORKDIR /Ultra-Forward-Bot
-COPY start.sh /start.sh
-CMD ["/bin/bash", "/start.sh"] 
+
+# Copy all project files
+COPY . .
+
+# Ensure start.sh has execute permissions
+RUN chmod +x start.sh
+
+# Start the bot
+CMD ["/bin/bash", "./start.sh"]
